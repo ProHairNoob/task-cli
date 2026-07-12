@@ -13,12 +13,24 @@ def add_cmd(description):
     tasks.append(new_task)
     save_task(tasks)
 
+def update_cmd(id,text):
+    tasks = load_task()
+    found_id = False
+    for task in tasks:
+        if task["id"] == id: 
+            task["description"] = text
+            found_id = True
+    if found_id == False:
+        print("invalid id")
+    save_task(tasks)
+
+
 def mark_cmd(id,status):
     tasks = load_task()
-    id_check = False
+    found_id = False
     for task in tasks:
         if task["id"] == id:
-            id_check = True
+            found_id = True
             if status == "done":
                 print("marked task as done")
                 task["status"] = "done"
@@ -30,7 +42,7 @@ def mark_cmd(id,status):
                 task["status"] = "in-progress"           
             else:
                 print("invalid status")
-    if id_check == False:
+    if found_id == False:
         print("invalid id")
     save_task(tasks)
     
