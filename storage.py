@@ -11,5 +11,5 @@ def load_task():
 
 def save_task(tasks):
     with file_path.open("w") as f:
-         json.dump(tasks,f)
+         json.dump(tasks,f,indent=2)
 
