@@ -1,5 +1,5 @@
 import argparse
-from tasks import add_cmd , list_cmd , mark_cmd ,update_cmd
+from tasks import add_cmd , list_cmd , mark_cmd ,update_cmd,delete_cmd
 parser = argparse.ArgumentParser(
     prog="task-cli",
     description="manage your tasks"
@@ -20,6 +20,9 @@ update = subparsers.add_parser("update")
 update.add_argument("id",type=int)
 update.add_argument("description")
 
+delete = subparsers.add_parser("delete")
+delete.add_argument("id",type=int)
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -34,7 +37,8 @@ if args.command == "mark":
     mark_cmd(args.id,args.status)
 if args.command == "update":
     update_cmd(args.id,args.description)
-
+if args.command == "delete":
+    delete_cmd(args.id)
 #debug
 #print(args,type(args)) #
 #
