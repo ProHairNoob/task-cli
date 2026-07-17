@@ -4,6 +4,9 @@ from storage import save_task , load_task
 time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 def add_cmd(description):
+    if description == "" or description.isspace():
+         print("Your task cannot be empty")
+         exit()
     tasks = load_task()
     ids = [task["id"] for task in tasks]
     if ids == []:
