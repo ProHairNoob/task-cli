@@ -1,7 +1,11 @@
 import json
 from pathlib import Path
+from platformdirs import user_config_dir
 
-file_path = Path("tasks.json")
+app_config_dir = Path(user_config_dir("task-cli"))
+app_config_dir.mkdir(parents=True, exist_ok=True)
+
+file_path = app_config_dir / "tasks.json"
 
 def load_task():
     if not file_path.exists():

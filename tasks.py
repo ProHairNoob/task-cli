@@ -29,6 +29,7 @@ def update_cmd(id,text):
             task["description"] = text
             task["updatedAt"] = time
             found_id = True
+            print("task updated")
     if found_id == False:
         print("invalid id")
     save_task(tasks)
@@ -42,14 +43,12 @@ def delete_cmd(id):
             found_id = True
             print("deleted task")
         if task["id"] != id:
-            new_task.append(task)            
-            
-                
+            new_task.append(task)
+
     if found_id == False:
         print("invalid id")
-
     save_task(new_task)
-            
+
 
 def mark_cmd(id,status):
     tasks = load_task()
