@@ -10,36 +10,41 @@ def add_cmd(description):
         exit()
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS tasks(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        desc TEXT NOT NULL,
-        status TEXT DEFAULT 'todo',
-        createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        """
-    )
     cursor.execute("INSERT INTO tasks (desc) VALUES (?)", (description,))
     conn.commit()
     conn.close()
-    print(f"task added{description}")
+    print(f"task added {description}")
 
 
-# def update_cmd(id, text):
-#     tasks = load_task()
-#     found_id = False
-#     for task in tasks:
-#         if task["id"] == id:
-#             task["description"] = text
-#             task["updatedAt"] = time
-#             found_id = True
-#             print("task updated")
-#     if not found_id:
-#         print("invalid id")
-#     save_task(tasks)
-#
-#
+def list_all_tasks():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM tasks")
+    tasks = cursor.fetchall()
+    for task in tasks:
+        print(
+            f"ID: {task['id']} TASK: {task['desc']} STATUS: {task['status']} CREATEDAT: {task['createdAt']} UPDATEDAT: {task['updatedAt']}"
+        )
+
+
+def update_cmd(desc, id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE tasks SET desc = ? WHERE id = ?", (desc, id))
+    if cursor.rowcount == 0:
+        print("error: invalid id or description identical")
+        exit()
+    conn.commit()
+    conn.close()
+
+
+def delete_cmd(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("")
+    conn.commit()
+
+
 # def delete_cmd(id):
 #     tasks = load_task()
 #     new_task = []

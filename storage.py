@@ -14,6 +14,21 @@ def get_db_connection():
     return conn
 
 
+def make_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS tasks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        desc TEXT NOT NULL,
+        status TEXT DEFAULT 'todo',
+        createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+
+
 # def load_task():
 #     if not file_path.exists():
 #         return []
