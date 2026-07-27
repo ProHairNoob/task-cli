@@ -10,9 +10,6 @@ task updated
 # viewing tasks
 task-cli list
 ID: 1 Task: solve the bug Created: 2026-07-17 20:33 Last Updated: 2026-07-17 20:33 
-# viewing tasks by status
-task-cli list todo
-ID: 1 Task: solve the bug Created: 2026-07-17 20:33 Last Updated: 2026-07-17 20:33 Status: todo
 # changing a tasks status
 task-cli mark 1 in-progress
 # deleting tasks
