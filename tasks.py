@@ -1,5 +1,6 @@
 import datetime
 from storage import get_db_connection
+import sqlite3
 
 time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -21,6 +22,9 @@ def list_all_tasks():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
+    if len(tasks) == 0:
+        print("No tasks available bird chirp ...")
+        exit()
     for task in tasks:
         print(
             f"ID: {task['id']} TASK: {task['desc']} STATUS: {task['status']} CREATEDAT: {task['createdAt']} UPDATEDAT: {task['updatedAt']}"
@@ -41,67 +45,32 @@ def update_cmd(desc, id):
 def delete_cmd(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("")
+    cursor.execute("SELECT desc FROM tasks WHERE id = ?", (id,))
+    desc = cursor.fetchone()
+    cursor.execute("DELETE FROM tasks WHERE id = ?", (id,))
+    if cursor.rowcount == 0:
+        print("error: invalid id")
+        exit()
+    print(f"task deleted: {desc['desc']}")
     conn.commit()
+    conn.close()
 
 
-# def delete_cmd(id):
-#     tasks = load_task()
-#     new_task = []
-#     found_id = False
-#     for task in tasks:
-#         if id == task["id"]:
-#             found_id = True
-#             print("deleted task")
-#         if task["id"] != id:
-#             new_task.append(task)
-#
-#     if found_id == False:
-#         print("invalid id")
-#     save_task(new_task)
-#
-#
-# def mark_cmd(id, status):
-#     tasks = load_task()
-#     found_id = False
-#     for task in tasks:
-#         if task["id"] == id:
-#             found_id = True
-#             if status == "done":
-#                 print("marked task as done")
-#                 task["status"] = "done"
-#                 task["updatedAt"] = time
-#             elif status == "todo":
-#                 print("marked task as todo")
-#                 task["status"] = "todo"
-#                 task["updatedAt"] = time
-#             elif status == "in-progress":
-#                 print("marked task as in progress")
-#                 task["status"] = "in-progress"
-#                 task["updatedAt"] = time
-#             else:
-#                 print("invalid status")
-#     if found_id == False:
-#         print("invalid id")
-#     save_task(tasks)
-#
-#
-# def list_cmd(arg):
-#     tasks = load_task()
-#     for task in tasks:
-#         if arg is None:
-#             print(
-#                 f"ID: {task['id']} Task: {task['description']} Created: {task['createdAt']} Last Updated: {task['updatedAt']} "
-#             )
-#         if arg == "done" and task.get("status") == "done":
-#             print(
-#                 f"ID: {task['id']} Task: {task['description']} Created: {task['createdAt']} Last Updated: {task['updatedAt']} Status: {task['status']}"
-#             )
-#         if arg == "todo" and task.get("status") == "todo":
-#             print(
-#                 f"ID: {task['id']} Task: {task['description']} Created: {task['createdAt']} Last Updated: {task['updatedAt']} Status: {task['status']}"
-#             )
-#         if arg == "in-progress" and task.get("status") == "in-progress":
-#             print(
-#                 f"ID: {task['id']} Task: {task['description']} Created: {task['createdAt']} Last Updated: {task['updatedAt']} Status: {task['status']}"
-#             )
+def mark_cmd(status, id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE tasks set status = ? WHERE id = ?", (status, id))
+        conn.commit()
+    except sqlite3.IntegrityError as error:
+        if "CHECK constraint failed" in str(error):
+            print("error: please choose one of todo in-progress done")
+            exit()
+    else:
+        if cursor.rowcount == 0:
+            print("error: invalid id")
+            exit()
+        else:
+            print(f"marked task as: {status}")
+
+    conn.close()

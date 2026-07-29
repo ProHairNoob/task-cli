@@ -19,9 +19,9 @@ def make_db():
     cursor = conn.cursor()
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS tasks(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY,
         desc TEXT NOT NULL,
-        status TEXT DEFAULT 'todo',
+        status TEXT CHECK (status IN ('todo','in-progress','done'))DEFAULT 'todo',
         createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
         updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
         )

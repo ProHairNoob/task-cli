@@ -3,15 +3,18 @@ from tasks import (
     add_cmd,
     list_all_tasks,
     update_cmd,
+    delete_cmd,
+    mark_cmd,
 )
 from storage import make_db
 
 # Initializing database
 make_db()
 
-
+# Initializing parsers
 parser = argparse.ArgumentParser(prog="task-cli", description="manage your tasks")
 subparsers = parser.add_subparsers(dest="command")
+
 add = subparsers.add_parser("add", help="adds a new task")
 add.add_argument("description", help="description of your task")
 
@@ -37,7 +40,7 @@ if args.command == "list":
     list_all_tasks()
 
 if args.command == "mark":
-    mark_cmd(args.id, args.status)
+    mark_cmd(args.status, args.id)
 
 if args.command == "update":
     update_cmd(args.description, args.id)
