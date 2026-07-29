@@ -32,9 +32,15 @@ def list_all_tasks():
 
 
 def update_cmd(desc, id):
+    if not desc or desc.isspace():
+        print("error: your task cannot be empty")
+        raise SystemExit(1)
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE tasks SET desc = ? WHERE id = ?", (desc, id))
+    cursor.execute(
+        "UPDATE tasks SET desc = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
+        (desc, id),
+    )
     if cursor.rowcount == 0:
         print("error: invalid id or description")
         raise SystemExit(1)
@@ -62,7 +68,10 @@ def mark_cmd(status, id):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE tasks set status = ? WHERE id = ?", (status, id))
+        cursor.execute(
+            "UPDATE tasks set status = ?,updatedAt = CURRENT_TIMESTAMP WHERE id = ?",
+            (status, id),
+        )
         conn.commit()
     except sqlite3.IntegrityError as error:
         if "CHECK constraint failed" in str(error):
