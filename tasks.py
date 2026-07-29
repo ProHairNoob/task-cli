@@ -9,6 +9,7 @@ def add_cmd(desc):
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
         raise SystemExit(1)
+    desc = desc.strip()
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO tasks (desc) VALUES (?)", (desc,))
@@ -39,6 +40,7 @@ def update_cmd(desc, id):
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
         raise SystemExit(1)
+    desc = desc.strip()
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
