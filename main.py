@@ -33,8 +33,10 @@ list_cli = subparsers.add_parser("list", help="shows your tasks in a list")
 
 args = parser.parse_args()
 
+
 if args.command == "add":
-    add_cmd(args.description)
+    desc = args.description.strip()
+    add_cmd(desc)
 
 if args.command == "list":
     list_all_tasks()
@@ -43,7 +45,8 @@ if args.command == "mark":
     mark_cmd(args.status, args.id)
 
 if args.command == "update":
-    update_cmd(args.description, args.id)
+    desc = args.description.strip()
+    update_cmd(desc, args.id)
 
 if args.command == "delete":
     delete_cmd(args.id)
