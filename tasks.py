@@ -1,10 +1,10 @@
-import datetime
-from storage import get_db_connection
+import click
 import sqlite3
+from storage import get_db_connection
 
-time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-
+@click.command(name="add", help="add a new task")
+@click.argument("desc", type=str, metavar="description")
 def add_cmd(desc):
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
@@ -17,6 +17,7 @@ def add_cmd(desc):
     print(f"task added {desc}")
 
 
+@click.command(name="list", help="view your tasks in a list")
 def list_all_tasks():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -31,6 +32,9 @@ def list_all_tasks():
         )
 
 
+@click.command(name="update", help="change a tasks description")
+@click.argument("id", type=int, metavar="id")
+@click.argument("desc", type=str, metavar="description")
 def update_cmd(desc, id):
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
@@ -42,7 +46,7 @@ def update_cmd(desc, id):
         (desc, id),
     )
     if cursor.rowcount == 0:
-        print("error: invalid id or description")
+        print("error: invalid id")
         raise SystemExit(1)
 
     print(f"task updated to: {desc}")
@@ -50,6 +54,8 @@ def update_cmd(desc, id):
     conn.close()
 
 
+@click.command(name="delete", help="delete a task")
+@click.argument("id", type=int, metavar="id")
 def delete_cmd(id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -64,6 +70,9 @@ def delete_cmd(id):
     conn.close()
 
 
+@click.command(name="mark", help="mark a task as one of: todo, in-progress, done")
+@click.argument("id", type=int, metavar="id")
+@click.argument("status", type=str, metavar="status")
 def mark_cmd(status, id):
     conn = get_db_connection()
     cursor = conn.cursor()

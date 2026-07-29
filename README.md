@@ -17,20 +17,17 @@ task-cli delete 1
 deleted task
 # help usage
 task-cli --help
-usage: task-cli [-h] {add,update,delete,mark,list} ...
+Usage: main.py [OPTIONS] COMMAND [ARGS]...
 
-manage your tasks
+Options:
+  --help  Show this message and exit.
 
-positional arguments:
-  {add,update,delete,mark,list}
-    add                 adds a new task
-    update              changes your tasks description
-    delete              delete a task
-    mark                change a tasks status
-    list                shows your tasks in a list
-
-options:
-  -h, --help            show this help message and exit
+Commands:
+  add     add a new task
+  delete  delete a task
+  list    view your tasks in a list
+  mark    mark a task as one of: todo, in-progress, done
+  update  change a tasks description
 ```
 
 
