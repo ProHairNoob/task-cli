@@ -19,24 +19,45 @@ def add_cmd(desc):
 
 
 @click.command(name="list", help="view your tasks in a list")
-def list_all_tasks():
+@click.argument(
+    "filter",
+    required=False,
+)
+@click.option("--status", type=click.Choice(["todo", "in-progress", "done"]))
+def list_all_tasks(status, filter):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM tasks")
+    # if status:
+    #     cursor.execute("SELECT * FROM tasks WHERE status = ?", (status,))
+    if filter and status:
+        cursor.execute(
+            "SELECT * FROM tasks WHERE desc LIKE '%' || ? || '%' AND status = ?",
+            (
+                filter,
+                status,
+            ),
+        )
+    elif filter:
+        cursor.execute(
+            "SELECT * FROM tasks WHERE desc LIKE '%' || ? || '%'",
+            (filter,),
+        )
+    else:
+        cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
     if len(tasks) == 0:
-        print("No tasks available bird chirp ...")
+        print("No matches")
         raise SystemExit(1)
     for task in tasks:
         print(
-            f"ID: {task['id']} TASK: {task['desc']} STATUS: {task['status']} CREATEDAT: {task['createdAt']} UPDATEDAT: {task['updatedAt']}"
+            f"ID: {task['id']} Task: {task['desc']} Status: {task['status']} Created: {task['createdAt']} Last Modified: {task['updatedAt']}"
         )
 
 
 @click.command(name="update", help="change a tasks description")
 @click.argument("id", type=int, metavar="id")
 @click.argument("desc", type=str, metavar="description")
-def update_cmd(desc, id):
+def update_cmd(id, desc):
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
         raise SystemExit(1)
