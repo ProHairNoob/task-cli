@@ -47,7 +47,7 @@ def list_all_tasks(status, filter):
     tasks = cursor.fetchall()
     if len(tasks) == 0:
         print("No matches")
-        raise SystemExit(1)
+        raise SystemExit(0)
     for task in tasks:
         print(
             f"ID: {task['id']} Task: {task['desc']} Status: {task['status']} Created: {task['createdAt']} Last Modified: {task['updatedAt']}"
@@ -78,10 +78,22 @@ def update_cmd(id, desc):
 
 
 @click.command(name="delete", help="delete a task")
-@click.argument("id", type=int, metavar="id")
-def delete_cmd(id):
+@click.argument("id", required=False, type=int, metavar="id")
+@click.option("--yes")
+def delete_cmd(id, yes):
     conn = get_db_connection()
     cursor = conn.cursor()
+    if not id and not yes:
+        confirm = input("No id given  delete all tasks? (y/n) ").strip().lower()
+        if confirm != "y":
+            print("Cancelled")
+            raise SystemExit(0)
+        elif confirm == "y" or confirm == "yes":
+            print("Deleting all tasks ...")
+            cursor.execute("DELETE from tasks")
+            conn.commit()
+            conn.close()
+            raise SystemExit(0)
     cursor.execute("SELECT desc FROM tasks WHERE id = ?", (id,))
     desc = cursor.fetchone()
     cursor.execute("DELETE FROM tasks WHERE id = ?", (id,))
