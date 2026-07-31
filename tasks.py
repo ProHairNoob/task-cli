@@ -4,8 +4,9 @@ from storage import get_db_connection
 
 
 @click.command(name="add", help="add a new task")
-@click.argument("desc", type=str, metavar="description")
+@click.argument("desc", type=str, nargs=-1, metavar="description")
 def add_cmd(desc):
+    desc = " ".join(desc)
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
         raise SystemExit(1)
