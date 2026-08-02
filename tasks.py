@@ -43,22 +43,33 @@ def list_all_tasks(status, filter):
             "SELECT * FROM tasks WHERE desc LIKE '%' || ? || '%'",
             (filter,),
         )
+    elif status:
+        cursor.execute("SELECT * FROM tasks WHERE status = ?", (status,))
     else:
         cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
     if len(tasks) == 0:
         print("No matches")
         raise SystemExit(0)
+    underline = "\033[4m"
+    reset = "\033[0m"
+    cursor.execute("SELECT desc FROM tasks ORDER BY LENGTH(desc) DESC LIMIT 1")
+    longest_string = cursor.fetchone()
+    max_width = len(longest_string["desc"])
+    print(
+        f"{underline}ID{reset} {underline}{'Description':<{max_width}}{reset} {underline}Status{reset} {underline}Last modified{reset}"
+    )
     for task in tasks:
         print(
-            f"ID: {task['id']} Task: {task['desc']} Status: {task['status']} Created: {task['createdAt']} Last Modified: {task['updatedAt']}"
+            f"{task['id']:<3}{task['desc']:<{max_width}}  {task['status']} {task['updatedAt']}"
         )
 
 
 @click.command(name="update", help="change a tasks description")
 @click.argument("id", type=int, metavar="id")
-@click.argument("desc", type=str, metavar="description")
+@click.argument("desc", type=str, nargs=-1, metavar="description")
 def update_cmd(id, desc):
+    desc = " ".join(desc)
     if not desc or desc.isspace():
         print("error: your task cannot be empty")
         raise SystemExit(1)
@@ -80,20 +91,26 @@ def update_cmd(id, desc):
 
 @click.command(name="delete", help="delete a task")
 @click.argument("id", required=False, type=int, metavar="id")
-@click.option("--yes")
-def delete_cmd(id, yes):
+def delete_cmd(
+    id,
+):
     conn = get_db_connection()
     cursor = conn.cursor()
-    if not id and not yes:
+    cursor.execute("SELECT * FROM tasks")
+    tasks = cursor.fetchall()
+    if len(tasks) == 0:
+        print("No matches")
+        raise SystemExit(0)
+    if not id:
         confirm = input("No id given  delete all tasks? (y/n) ").strip().lower()
-        if confirm != "y":
-            print("Cancelled")
-            raise SystemExit(0)
-        elif confirm == "y" or confirm == "yes":
+        if confirm == "y" or confirm == "yes":
             print("Deleting all tasks ...")
             cursor.execute("DELETE from tasks")
             conn.commit()
             conn.close()
+            raise SystemExit(0)
+        elif confirm != "y" or confirm != "yes":
+            print("Cancelled")
             raise SystemExit(0)
     cursor.execute("SELECT desc FROM tasks WHERE id = ?", (id,))
     desc = cursor.fetchone()
